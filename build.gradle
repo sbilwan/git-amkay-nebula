@@ -13,6 +13,8 @@ plugins {
    // id 'org.unbroken-dome.test-sets' version '1.4.4'
     id 'java'
     id 'maven'
+   // id "nebula.release" version "6.3.2"
+    id "nebula.project" version "3.4.1"
 }
 
 apply plugin: 'com.github.amkay.gitflow'
@@ -49,7 +51,7 @@ integrationTest {
     }
 }*/
 //create sources jar
-task sourcesJar(type: Jar, dependsOn: classes) {
+/*task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
@@ -58,17 +60,18 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
-}
-
+}*/
+/*
 artifacts{
     archives sourcesJar
     archives javadocJar
-}
+}*/
 
 //create a list of types that are eligible for upload to Nexus. See enum here:
 //https://amkay.github.io/gradle-gitflow/release/0.2.0/doc/groovydoc/com/github/amkay/gradle/gitflow/version/VersionType.html
-
+/*
 def buildType = version.type.toString().toUpperCase()
+println version.type
 uploadArchives.dependsOn jar
 uploadArchives.enabled = buildType.toUpperCase() in ['PRE_RELEASE', 'DEVELOP', 'RELEASE']
 
@@ -85,8 +88,9 @@ def targetRepo(String versionType){
 
     println("version type: $versionType => repo mapping : $target")
     return target
-}
+}*/
 
+/*
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -97,5 +101,21 @@ uploadArchives {
             pom.artifactId = "commons"
             pom.groupId = "com.telensa.apps"
         }
+    }
+}*/
+
+println version.type.toString()
+
+// publishing to nexus using nebula plugin
+publishing {
+    repositories {
+        maven {
+            url "http://localhost:8081/repository/testamkayreleaseplugin-${version.type.toString().endsWith('RELEASE') ? 'releases' : 'snapshots'}"
+            credentials {
+                username "admin"
+                password "admin123"
+            }
+        }
+        mavenLocal()
     }
 }
