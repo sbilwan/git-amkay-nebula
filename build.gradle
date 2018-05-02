@@ -14,10 +14,11 @@ plugins {
     id 'java'
     id 'maven'
    // id "nebula.release" version "6.3.2"
-    id "nebula.project" version "3.4.1"
+    //id "nebula.project" version "3.4.1"
 }
 
 apply plugin: 'com.github.amkay.gitflow'
+apply plugin: 'maven-publish'
 
 
 /*def VERSION = [SECURITY: '2.2.1.RELEASE', GUAVA: '24.1-jre', ASSURED: '3.0.6', JODA: '2.9.9', RANDOMIZER: '3.7.0', TEST: '5.0.4.RELEASE'
@@ -102,7 +103,8 @@ uploadArchives {
             pom.groupId = "com.telensa.apps"
         }
     }
-}*/
+}
+*/
 
 println version.type.toString()
 
@@ -117,6 +119,14 @@ publishing {
                 username "admin"
                 password "admin123"
             }
+            publications{
+                impl(MavenPublication) {
+                    groupId 'com.telensa.apps'
+                    artifactId 'git-amkay-nebula'
+                    version "${version}"
+                }
+            }
+
         }
         mavenLocal()
     }
