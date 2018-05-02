@@ -106,9 +106,13 @@ uploadArchives {
 }
 */
 
-println version.type.toString()
+// println version.type.toString()
 
-group = "com.telensa.apps"
+//group = "com.telensa.apps"
+
+def buildType = version.type.toString().endsWith('RELEASE') ? 'releases' : 'snapshots'
+def projVersionType = buildType == 'snapshots' ? 'SNAPSHOT' : 'RELEASE'
+println projVersionType
 
 // publishing to nexus using nebula plugin
 publishing {
@@ -123,7 +127,7 @@ publishing {
                 impl(MavenPublication) {
                     groupId 'com.telensa.apps'
                     artifactId 'git-amkay-nebula'
-                    version "${version}"
+                    version "${version}"-projVersionType
                 }
             }
 
