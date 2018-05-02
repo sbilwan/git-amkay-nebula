@@ -106,6 +106,8 @@ uploadArchives {
 
 println version.type.toString()
 
+group = "com.telensa.apps"
+
 // publishing to nexus using nebula plugin
 publishing {
     repositories {
