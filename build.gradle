@@ -1,0 +1,101 @@
+import groovy.transform.Field
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.github.amkay:gradle-gitflow:0.2.0")
+    }
+}
+plugins {
+   // id 'org.unbroken-dome.test-sets' version '1.4.4'
+    id 'java'
+    id 'maven'
+}
+
+apply plugin: 'com.github.amkay.gitflow'
+
+
+/*def VERSION = [SECURITY: '2.2.1.RELEASE', GUAVA: '24.1-jre', ASSURED: '3.0.6', JODA: '2.9.9', RANDOMIZER: '3.7.0', TEST: '5.0.4.RELEASE'
+               , JWT   : '3.3.0', SPRING: '5.0.4.RELEASE', JUNIT: '4.12']*/
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+/*
+testSets {
+    integrationTest { createArtifact = true }
+}*/
+
+/*dependencies {
+    compile "junit:junit:${VERSION.JUNIT}"
+    compile "org.springframework.security.oauth:spring-security-oauth2:${VERSION.SECURITY}"
+    compile "io.rest-assured:rest-assured:${VERSION.ASSURED}"
+    compile "joda-time:joda-time:${VERSION.JODA}"
+    compile "io.github.benas:random-beans:${VERSION.RANDOMIZER}"
+    compile("com.auth0:java-jwt:${VERSION.JWT}")
+
+
+}
+integrationTest {
+    outputs.upToDateWhen { false }
+
+    afterTest { desc, result ->
+        println "Executing unit test [${desc.className}].${desc.name} with result: ${result.resultType}"
+    }
+}*/
+//create sources jar
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+//create javadoc jar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts{
+    archives sourcesJar
+    archives javadocJar
+}
+
+//create a list of types that are eligible for upload to Nexus. See enum here:
+//https://amkay.github.io/gradle-gitflow/release/0.2.0/doc/groovydoc/com/github/amkay/gradle/gitflow/version/VersionType.html
+
+def buildType = version.type.toString().toUpperCase()
+uploadArchives.dependsOn jar
+uploadArchives.enabled = buildType.toUpperCase() in ['PRE_RELEASE', 'DEVELOP', 'RELEASE']
+
+@Field def repoMappings = new HashMap<>()
+repoMappings['SNAPSHOT'] = ['PRE_RELEASE', 'DEVELOP', 'DETACHED_HEAD', 'FEATURE', 'HOTFIX', 'SUPPORT']
+repoMappings['RELEASE'] = ['RELEASE']
+
+def targetRepo(String versionType){
+
+    String target = 'SNAPSHOT'
+    repoMappings.forEach { key, values ->
+        if(versionType in values) target = key
+    }
+
+    println("version type: $versionType => repo mapping : $target")
+    return target
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "http://localhost:8081/repository/testamkayreleaseplugin-${targetRepo(buildType).toLowerCase()}s/") {
+                authentication(userName: "admin", password: "admin123")
+            }
+            pom.version = "${version}-${targetRepo(buildType)}"
+            pom.artifactId = "commons"
+            pom.groupId = "com.telensa.apps"
+        }
+    }
+}
