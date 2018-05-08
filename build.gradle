@@ -29,7 +29,7 @@ repositories {
 println grgit.branch.getCurrent().getName()
 def branchName = grgit.branch.getCurrent().getName()
 
-def buildType = version.toString().endsWith('RELEASE') ? 'releases' : 'snapshots'
+def buildType = (branchName.toUpperCase().startsWith('RELEASE') || branchName.toUpperCase().startsWith('MASTER')) ? 'releases' : 'snapshots'
 def projVersionType = buildType == 'snapshots' ? 'SNAPSHOT' : 'RELEASE'
 println projVersionType
 
@@ -38,7 +38,8 @@ println projVersionType
 publishing {
     repositories {
         maven {
-            if (version.toString().endsWith('RELEASE'))
+            if (projVersionType == 'RELEASE')
+            //if (version.toString().endsWith('RELEASE'))
                 url "http://localhost:8081/repository/testamkayreleasepluginddd-releases"
             else
                 url "http://localhost:8081/repository/testamkayreleaseplugin-snapshots"
