@@ -3,19 +3,16 @@ buildscript {
         jcenter()
         mavenCentral()
     }
-    //dependencies {
-       // classpath("com.github.amkay:gradle-gitflow:0.2.0")
     /*dependencies {
         compile 'org.ajoberstar:grgit:2.2.0'
-
-    }*/
-//    }
+   }*/
 }
 plugins {
     id 'java'
     id 'maven'
     id "nebula.project" version "3.4.1"
-    id 'org.ajoberstar.grgit' version '1.7.2'
+    //id 'org.ajoberstar.grgit' version '1.7.2'
+    id "com.palantir.git-version" version "0.11.0"
 }
 
 //apply plugin: 'com.github.amkay.gitflow'
@@ -26,24 +23,35 @@ repositories {
     mavenCentral()
 }
 
-println grgit.branch.getCurrent().getName()
-def branchName = grgit.branch.getCurrent().getName()
+//println grgit.branch.getCurrent().getName()
+//def branchName = grgit.branch.getCurrent().getName()
 
-def buildType = (branchName.toUpperCase().startsWith('RELEASE') || branchName.toUpperCase().startsWith('MASTER')) ? 'releases' : 'snapshots'
+/*def buildType = (branchName.toUpperCase().startsWith('RELEASE') || branchName.toUpperCase().startsWith('MASTER')) ? 'releases' : 'snapshots'
+def projVersionType = buildType == 'snapshots' ? 'SNAPSHOT' : 'RELEASE'
+println projVersionType
+println gitVersion()*/
+
+def details = versionDetails()
+
+def buildType = (details.branchName.toUpperCase().startsWith('RELEASE') || details.branchName.toUpperCase().startsWith('MASTER')) ? 'releases' : 'snapshots'
 def projVersionType = buildType == 'snapshots' ? 'SNAPSHOT' : 'RELEASE'
 println projVersionType
 
+
+
+def projVersion = projVersionType == 'RELEASE' && details.branchName.startsWith('release') ? gitVersion() + '.rc+' + details.gitHash : gitVersion() + '+' + details.gitHash
+println 'Version of the project is ' + projVersion
+println 'Branch name is ' + versionDetails().branchName
+println 'Last tag is ' + versionDetails().lastTag
 
 // publishing to nexus using nebula plugin
 publishing {
     repositories {
         maven {
             if (projVersionType == 'RELEASE')
-            //if (version.toString().endsWith('RELEASE'))
-                url "http://localhost:8081/repository/testamkayreleasepluginddd-releases"
+                url "http://localhost:8081/repository/testamkayreleaseplugin-releases"
             else
                 url "http://localhost:8081/repository/testamkayreleaseplugin-snapshots"
-            //url "http://localhost:8081/repository/testamkayreleaseplugin-${version.type.toString().endsWith('RELEASE') ? 'releases' : 'snapshots'}"
             credentials {
                 username "admin"
                 password "admin123"
@@ -52,7 +60,7 @@ publishing {
                 nebula(MavenPublication) {
                     groupId 'com.telensa.apps'
                     artifactId 'git-amkay-nebula'
-                    version "${version}-${projVersionType}"
+                    version "$projVersion"-"${projVersionType}"
                 }
             }
 
