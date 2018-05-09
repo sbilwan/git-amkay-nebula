@@ -39,7 +39,7 @@ println projVersionType
 
 
 
-def projVersion = projVersionType == 'RELEASE' && details.branchName.startsWith('release') ? gitVersion() + '.rc +' + details.gitHash : gitVersion() + '+' + details.gitHash
+def projVersion = projVersionType == 'RELEASE' && details.branchName.startsWith('release') ? gitVersion() + '.rc+' + details.gitHash : gitVersion() + '+' + details.gitHash
 println 'Version of the project is ' + projVersion
 println 'Branch name is ' + versionDetails().branchName
 println 'Last tag is ' + versionDetails().lastTag
