@@ -32,21 +32,24 @@ println projVersionType
 println gitVersion()*/
 
 def details = versionDetails()
-def projVersion = gitVersion() + '+' + details.gitHash
-println 'Version of the project is ' + projVersion
-println 'Branch name is ' + versionDetails().branchName
-println 'Last tag is ' + versionDetails().lastTag
 
 def buildType = (details.branchName.toUpperCase().startsWith('RELEASE') || details.branchName.toUpperCase().startsWith('MASTER')) ? 'releases' : 'snapshots'
 def projVersionType = buildType == 'snapshots' ? 'SNAPSHOT' : 'RELEASE'
 println projVersionType
+
+
+
+def projVersion = projVersionType == 'RELEASE' && details.branchName.startsWith('release') ? gitVersion() + '.rc +' + details.gitHash : gitVersion() + '+' + details.gitHash
+println 'Version of the project is ' + projVersion
+println 'Branch name is ' + versionDetails().branchName
+println 'Last tag is ' + versionDetails().lastTag
 
 // publishing to nexus using nebula plugin
 publishing {
     repositories {
         maven {
             if (projVersionType == 'RELEASE')
-                url "http://localhost:8081/repository/testamkayreleasepluginddd-releases"
+                url "http://localhost:8081/repository/testamkayreleaseplugin-releases"
             else
                 url "http://localhost:8081/repository/testamkayreleaseplugin-snapshots"
             credentials {
