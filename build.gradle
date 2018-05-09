@@ -31,14 +31,15 @@ def projVersionType = buildType == 'snapshots' ? 'SNAPSHOT' : 'RELEASE'
 println projVersionType
 println gitVersion()*/
 
-//def details = versionDetails()
-println 'Git version is ' + gitVersion()
+def details = versionDetails()
+def projVersion = gitVersion() + '+' + details.gitHash
+println 'Version of the project is ' + projVersion
 println 'Branch name is ' + versionDetails().branchName
 println 'Last tag is ' + versionDetails().lastTag
-println 'Git Hash is ' + versionDetails().gitHash
 
-def buildType = (versionDetails().branchName.toUpperCase().startsWith('RELEASE') || versionDetails().branchName.toUpperCase().startsWith('RELEASE')) ? 'releases' : 'snapshots'
+def buildType = (details.branchName.toUpperCase().startsWith('RELEASE') || details.branchName.toUpperCase().startsWith('MASTER')) ? 'releases' : 'snapshots'
 def projVersionType = buildType == 'snapshots' ? 'SNAPSHOT' : 'RELEASE'
+println projVersionType
 
 // publishing to nexus using nebula plugin
 publishing {
@@ -56,7 +57,7 @@ publishing {
                 nebula(MavenPublication) {
                     groupId 'com.telensa.apps'
                     artifactId 'git-amkay-nebula'
-                    version gitVersion()-"${projVersionType}"
+                    version "$projVersion"-"${projVersionType}"
                 }
             }
 
