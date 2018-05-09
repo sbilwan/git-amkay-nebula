@@ -32,9 +32,10 @@ println projVersionType
 println gitVersion()*/
 
 //def details = versionDetails()
-println gitVersion()
-println versionDetails().branchName
-println versionDetails().lastTag
+println 'Git version is ' + gitVersion()
+println 'Branch name is ' + versionDetails().branchName
+println 'Last tag is ' + versionDetails().lastTag
+println 'Git Hash is ' + versionDetails().gitHash
 
 def buildType = (versionDetails().branchName.toUpperCase().startsWith('RELEASE') || versionDetails().branchName.toUpperCase().startsWith('RELEASE')) ? 'releases' : 'snapshots'
 def projVersionType = buildType == 'snapshots' ? 'SNAPSHOT' : 'RELEASE'
