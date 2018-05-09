@@ -57,7 +57,7 @@ publishing {
                 nebula(MavenPublication) {
                     groupId 'com.telensa.apps'
                     artifactId 'git-amkay-nebula'
-                    version "$projVersion"-"${projVersionType}"
+                    version "${projVersion}-${projVersionType}"
                 }
             }
 
